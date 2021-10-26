@@ -1,0 +1,74 @@
+<?php
+include ('includes/connection.php');
+		$output = '';
+		if(isset($_POST["query"]))
+		{
+		 	$search = mysqli_real_escape_string($connect, $_POST["query"]);
+		 	$query = "
+		  		SELECT * FROM tbl_books
+		  		WHERE booktitle LIKE '%".$search."%'
+		  		OR category LIKE '%".$search."%' 
+		  		OR author LIKE '%".$search."%' 
+		  		OR copies LIKE '%".$search."%' 
+		  		OR publishername LIKE '%".$search."%'
+		  		OR datepublished LIKE '%".$search."%'
+		  		OR remaining LIKE '%".$search."%'
+		 	";
+		}
+		else
+		{
+		 	$query = "
+		  		SELECT * FROM tbl_books ORDER BY booktitle ASC
+		 	";
+		}
+		$result = mysqli_query($connect, $query);
+		if(mysqli_num_rows($result) > 0)
+		{
+
+		 	$output .= '
+	
+		 	';	
+		 	while($row = mysqli_fetch_array($result))
+		 	{
+	
+
+		  		$output .= '
+				  		<div class="d-inline-flex p-3 mx-auto ">
+				  			<div class="card mx-auto " style="width:20rem; height:40rem;">
+		  						<div class="card-header">
+		  		';
+		  						if($row['remaining'] == 0){
+		 				$output .= '<span class="badge badge-danger">Not Available</span>';
+		 						}
+		 						else{
+		 				$output .= '<span class="badge badge-success">Available</span>';
+		 						}
+		  			$output .='
+		  						</div>
+								<div class="card-body">
+									<div class="col">
+					  					<div class="container mb-3" style="height: 300px">
+					  						<img src="admin/uploads/'.$row["bookcover"].'" style="width:100%; height:100%" class="img-thumbnail"><br><br>
+					  					</div>
+					  				</div>
+					  				<div class="col font-weight-light">
+					  					<label><b>Book Title:</b> '.$row["booktitle"].' </label>
+					  					<label><b>Category:</b> '.$row["category"].' </label>
+					  					<label><b>Author:</b> '.$row["author"].' </label>
+					  					<label><b>Publisher:</b> '.$row["publishername"].' </label>
+					  					<label><b>Total Copies:</b> '.$row["copies"].' </label>
+					  					<label><b>Remaining Copies:</b> '.$row["remaining"].' </label>
+					  				</div>				
+								</div>
+							</div>
+				  		</div>
+		  			';
+		 	}
+		 	echo $output;
+			}
+		else
+		{
+		 	echo 'Book Not Found';
+		}
+
+?>
